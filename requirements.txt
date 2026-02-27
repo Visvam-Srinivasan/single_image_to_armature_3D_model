@@ -1,0 +1,31 @@
+# --- Image Processing & AI ---
+opencv-python
+mediapipe
+ultralytics
+pillow
+
+# --- 3D Modeling & SMPL-X ---
+torch
+torchvision
+torchaudio
+smplx
+chumpy
+# numpy must be pinned to avoid 'chumpy' and 'smplx' compatibility errors
+numpy<1.24.0
+
+# --- Geometry & Mesh Handling ---
+trimesh
+scipy
+pyrender  # Required if you want to render the SMPL-X mesh to an image
+networkx
+pyglet<2.0 # Required by trimesh for some 3D viewing tasks
+
+# --- Visualization & UI ---
+pyvista
+PyQt5
+qtpy
+
+# --- Utilities ---
+tqdm      # For progress bars during 3D fitting
+pyyaml
+h5py      # Common format for 3D model weights

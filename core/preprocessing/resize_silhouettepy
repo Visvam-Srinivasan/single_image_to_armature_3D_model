@@ -1,0 +1,61 @@
+import cv2
+import numpy as np
+import sys
+
+
+def ressize_silhouette(input_path, output_path, target_size=224):
+    # Read image in grayscale
+    img = cv2.imread(input_path, cv2.IMREAD_GRAYSCALE)
+
+    if img is None:
+        print("Error: Could not read input image.")
+        return
+
+    # Ensure binary silhouette
+    _, img = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
+
+    # Find bounding box
+    coords = cv2.findNonZero(img)
+    if coords is None:
+        print("Warning: No silhouette detected.")
+        padded = np.zeros((target_size, target_size), dtype=np.uint8)
+        cv2.imwrite(output_path, padded)
+        return
+
+    x, y, w, h = cv2.boundingRect(coords)
+    cropped = img[y:y+h, x:x+w]
+
+    # Resize while preserving aspect ratio
+    scale = target_size / max(h, w)
+    new_h = int(h * scale)
+    new_w = int(w * scale)
+
+    resized = cv2.resize(
+        cropped,
+        (new_w, new_h),
+        interpolation=cv2.INTER_NEAREST
+    )
+
+    # Pad to square 224x224
+    padded = np.zeros((target_size, target_size), dtype=np.uint8)
+
+    y_offset = (target_size - new_h) // 2
+    x_offset = (target_size - new_w) // 2
+
+    padded[y_offset:y_offset+new_h, x_offset:x_offset+new_w] = resized
+
+    # Save output
+    cv2.imwrite(output_path, padded)
+
+    print("Image successfully converted to 224x224.")
+
+
+if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        print("Usage: python3 preprocess_one.py input_image output_image")
+        sys.exit(1)
+
+    input_image = sys.argv[1]
+    output_image = sys.argv[2]
+
+    ressize_silhouette(input_image, output_image)
