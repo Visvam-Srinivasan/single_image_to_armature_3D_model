@@ -103,11 +103,17 @@ def main():
     betas = data.get('betas', data.get('shape', []))
     if betas:
         bpy.ops.object.mode_set(mode='OBJECT')
-        for i, b in enumerate(betas):
-            name = f"Shape{i:03d}"
-            if name in obj.data.shape_keys.key_blocks:
-                obj.data.shape_keys.key_blocks[name].value = float(b)
-        bpy.ops.object.smplx_update_joint_locations('EXEC_DEFAULT')
+        bpy.context.view_layer.objects.active = obj
+        obj.select_set(True)
+
+        if obj.data.shape_keys:
+            for i, b in enumerate(betas):
+                key = obj.data.shape_keys.key_blocks.get(f"Shape{i:03d}")
+                if key:
+                    key.value = float(b)
+
+        bpy.context.view_layer.update()
+        bpy.context.evaluated_depsgraph_get().update()
 
     def pick(*keys):
         for k in keys:
